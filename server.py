@@ -50,7 +50,6 @@ def get_move():
                 action = evaluarTurn(game_state)
             elif game_state["phase"] == "RIVER":
                 action = evaluarRiver(game_state)
-
         return jsonify(action=action)
     except Exception as err:
         print(err)
