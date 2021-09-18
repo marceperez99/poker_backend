@@ -36,7 +36,10 @@ def get_move():
     try:
         action = ""
         if game_state["strategy"] == "LIE":
-            return Response('{"action": "RAISE"}',mimetype="application/json")
+            if "RAISE" in game_state["actions"]:
+                action = "RAISE"
+            else:
+                action = "BET"
         else:
             #THINK     
             if game_state["phase"] == "PRE-FLOP":
@@ -48,9 +51,7 @@ def get_move():
             elif game_state["phase"] == "RIVER":
                 action = evaluarRiver(game_state)
 
-            return jsonify(action=action)
-                
-            return Response('{"action": "HEHE"}',mimetype="application/json")
+        return jsonify(action=action)
     except Exception as err:
         print(err)
         raise err
