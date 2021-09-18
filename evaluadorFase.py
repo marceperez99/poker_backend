@@ -19,14 +19,14 @@ def evaluarPreFlop(game_state):
                 
     val = calcularCartas(hand[0],hand[1])
     print(val)
-    if val > 0.80:
+    if val >= 0.80:
         return "RAISE"
-    elif val > 0.60 and val > percentSpent:
+    elif val >= 0.60 and val >= percentSpent:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.50 and val > 0.80*percentSpent:
+    elif val >= 0.50 and val >= 0.80*percentSpent:
         if "CHECK" in actions:
             return "CHECK"
         elif "CALL" in actions:
@@ -67,17 +67,17 @@ def evaluarFlop(game_state):
     fin = time.time()
     print(fin-inicio)
     val = success/count
-    if val > 0.80:
+    if val >= 0.80:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.60 and val > percentSpent:
+    elif val >= 0.60 and val >= percentSpent:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.50 and val > 0.80*percentSpent:
+    elif val >= 0.50 and val >= 0.80*percentSpent:
         if "CHECK" in actions:
             return "CHECK"
         elif "CALL" in actions:
@@ -116,17 +116,17 @@ def evaluarTurn(game_state):
     fin = time.time()
     print(fin-inicio)
     val = success/count
-    if val > 0.80:
+    if val >= 0.80:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.60 and val > percentSpent:
+    elif val >= 0.60 and val >= percentSpent:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.50 and val > 0.80*percentSpent:
+    elif val >= 0.50 and val >= 0.80*percentSpent:
         if "CHECK" in actions:
             return "CHECK"
         elif "CALL" in actions:
@@ -158,17 +158,17 @@ def evaluarRiver(game_state):
     fin = time.time()
     print(fin-inicio)
     val = success/count
-    if val > 0.80:
+    if val >= 0.80:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.60 and val > percentSpent:
+    elif val >= 0.60 and val >= percentSpent:
         if "RAISE" in actions:
             return "RAISE"
         elif "BET" in actions:
             return "BET"
-    elif val > 0.50 and val > 0.80*percentSpent:
+    elif val >= 0.50 and val >= 0.80*percentSpent:
         if "CHECK" in actions:
             return "CHECK"
         elif "CALL" in actions:
