@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, Response
 import itertools
-from evaluator import getEvaluation
+from evaluator import get_best_hand, evaluate_winner
 from calcularCartas import calcularCartas
-from evaluadorFase import evaluarPreFlop
+from evaluadorFase import evaluarPreFlop,evaluarFlop, evaluarRiver,evaluarTurn
 
 app = Flask(__name__)
 
@@ -35,19 +35,25 @@ def get_move():
     print(game_state)
     try:
         action = ""
-        if game_state["strategy"] == "LYING":
+        if game_state["strategy"] == "LIE":
             return Response('{"action": "RAISE"}',mimetype="application/json")
-        else:     
+        else:
+            #THINK     
             if game_state["phase"] == "PRE-FLOP":
-                initialChips = game_state["initialChips"]
-                remainingChips = game_state["remainingChips"]
-                percentSpent = 1 - (remainingChips/initialChips)
-                action = evaluarPreFlop(game_state["player"],percentSpent,game_state['actions'])
-                return jsonify(action=action)
+                action = evaluarPreFlop(game_state)
+            elif game_state["phase"] == "FLOP":
+                action = evaluarFlop(game_state)
+            elif game_state["phase"] == "TURN":
+                action = evaluarTurn(game_state)
+            elif game_state["phase"] == "RIVER":
+                action = evaluarRiver(game_state)
+
+            return jsonify(action=action)
                 
             return Response('{"action": "HEHE"}',mimetype="application/json")
     except Exception as err:
         print(err)
+        raise err
         return Response("",status=500, mimetype="application/json")
 
 @app.route("/get_winner", methods=['POST'])
@@ -71,39 +77,10 @@ def get_winner():
         player_1 = game_state["player_1"]
         player_2 = game_state["player_2"]
         community = game_state["community"]
-        best_hand_player_1 = -1,-1
-        best_hand_player_2 = -1,-1
-        #player_1
-
-        for possible_hand in itertools.combinations(player_1 + community, 5):
-            val,kicker = getEvaluation(list(possible_hand))
-            if val > best_hand_player_1[0]:
-                best_hand_player_1 = val,kicker
-            elif val == best_hand_player_1[0]:
-                if kicker > best_hand_player_1[1]:
-                    best_hand_player_1 = val,kicker
-        for possible_hand in itertools.combinations(player_2 + community, 5):
-            val,kicker = getEvaluation(list(possible_hand))
-            if val > best_hand_player_2[0]:
-                best_hand_player_2 = val,kicker
-            elif val == best_hand_player_2[0]:
-                if kicker > best_hand_player_2[1]:
-                    best_hand_player_2 = val,kicker
-        print(best_hand_player_1)
-        print(best_hand_player_2)
-        winner = 0
-        if(best_hand_player_1[0]>best_hand_player_2[0]):
-            winner  = 1
-        elif(best_hand_player_1[0] == best_hand_player_2[0]):
-            if(best_hand_player_1[1] > best_hand_player_2[1]):
-                winner = 1
-            elif(best_hand_player_1[1] < best_hand_player_2[1]):
-                winner = 2
-        else:
-            winner = 2
-        
+        best_hand_player_1 = get_best_hand(player_1 + community)
+        best_hand_player_2 = get_best_hand(player_1+community)
+        winner = evaluate_winner(best_hand_player_1,best_hand_player_2)    
         return Response('{"winner": ' + str(winner) + '}',mimetype="application/json")
     except Exception as err:
         print(err)
         return Response(str(err),status=500, mimetype="application/json")
-

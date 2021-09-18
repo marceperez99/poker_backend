@@ -1,3 +1,6 @@
+import itertools
+import sqlite3
+memo = {}
 def get_suit(card):
     return card[-1]
 def get_numerical_value(card):
@@ -76,9 +79,9 @@ def is_full_house(hand):
 def is_four_of_a_kind(hand):
     #113 to 125     
     if get_numerical_value(hand[0]) == get_numerical_value(hand[3]):
-        return 125 - (14 - get_numerical_value[1]),get_numerical_value(hand[4])
+        return 125 - (14 - get_numerical_value(hand[1])),get_numerical_value(hand[4])
     if get_numerical_value(hand[1]) == get_numerical_value(hand[4]):
-        return 125 - (14 - get_numerical_value[1]),get_numerical_value(hand[0]) 
+        return 125 - (14 - get_numerical_value(hand[1])),get_numerical_value(hand[0]) 
     return -1,-1
 
 def is_straight_flush(hand):
@@ -112,12 +115,48 @@ def getEvaluation(hand):
         is_pair,
         is_highcard
     ]
+    hand.sort(key=get_numerical_value)
 
     for evaluator in evaluators:
-        hand.sort(key=get_numerical_value)
         result,kicker = evaluator(hand)
         #La mano coincide con el evaluador
         if result >= 0:
             return result,kicker
     #Este codigo nunca se ejecuta hehe
     return -1,-1
+
+def get_best_hand(cards):
+    best_hand = -1,-1
+    for possible_hand in itertools.combinations(cards, 5):
+        if possible_hand in memo:
+            val,kicker = memo[possible_hand]
+        else:
+            val,kicker = getEvaluation(list(possible_hand))
+            memo[possible_hand] = (val,kicker)
+        if val > best_hand[0]:
+            best_hand = val,kicker
+        elif val == best_hand[0]:
+            if kicker > best_hand[1]:
+                best_hand = val,kicker
+    return best_hand
+def evaluate_winner(player_1,player_2):
+    winner = 0
+    if(player_1[0]>player_2[0]):
+        winner = 1
+    elif(player_1[0] == player_2[0]):
+        if(player_1[1] > player_2[1]):
+            winner = 1
+        elif(player_1[1] < player_2[1]):
+            winner = 2
+    else:
+        winner = 2
+    return winner
+def get_sql_evaluation(hand):
+    hand.sort()
+    hand =  "".join(hand)
+    db = sqlite3.connect('hands.db')
+    cursor = db.cursor()
+    cursor.execute(f"SELECT evaluation,kicker from hands where id='{hand}'")
+    row = cursor.fetchall()
+    return row[0]
+
