@@ -1,13 +1,10 @@
 from flask import Flask, request, jsonify, Response
-import itertools
 from evaluator import get_best_hand, evaluate_winner
-from calcularCartas import calcularCartas
 from evaluadorFase import evaluarPreFlop,evaluarFlop, evaluarRiver,evaluarTurn
 
 app = Flask(__name__)
 
-
-@app.route("/get_move",methods=['POST'])
+@app.route("/get_move",methods=['POST','OPTIONS'])
 def get_move():
     """
         The body of this method must be
@@ -31,6 +28,8 @@ def get_move():
 
         Response: {“action”: <ACTION>}
     """
+    if request.method == 'OPTIONS':
+        return Response("",status=200, mimetype="application/json")
     game_state = request.json
     print(game_state)
     try:
@@ -47,10 +46,10 @@ def get_move():
                 action = evaluarTurn(game_state)
             elif game_state["phase"] == "RIVER":
                 action = evaluarRiver(game_state)
-
+            print(action)
             return jsonify(action=action)
                 
-            return Response('{"action": "HEHE"}',mimetype="application/json")
+            
     except Exception as err:
         print(err)
         raise err
@@ -84,3 +83,10 @@ def get_winner():
     except Exception as err:
         print(err)
         return Response(str(err),status=500, mimetype="application/json")
+
+@app.after_request 
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    header['Access-Control-Allow-Headers'] = '*'
+    return response
