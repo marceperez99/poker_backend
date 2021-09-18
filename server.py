@@ -35,7 +35,10 @@ def get_move():
     try:
         action = ""
         if game_state["strategy"] == "LIE":
-            return Response('{"action": "RAISE"}',mimetype="application/json")
+            if "RAISE" in game_state["actions"]:
+                action = "RAISE"
+            else:
+                action = "BET"
         else:
             #THINK     
             if game_state["phase"] == "PRE-FLOP":
