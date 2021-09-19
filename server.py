@@ -31,7 +31,6 @@ def get_move():
     if request.method == 'OPTIONS':
         return Response("",status=200, mimetype="application/json")
     game_state = request.json
-    print(game_state)
     try:
         action = ""
         if game_state["strategy"] == "LIE":
@@ -74,13 +73,13 @@ def get_winner():
     """
     game_state = request.json
 
-    print(game_state)
     try:
         player_1 = game_state["player_1"]
         player_2 = game_state["player_2"]
         community = game_state["community"]
         best_hand_player_1 = get_best_hand(player_1 + community)
-        best_hand_player_2 = get_best_hand(player_1+community)
+        best_hand_player_2 = get_best_hand(player_2+community)
+        
         winner = evaluate_winner(best_hand_player_1,best_hand_player_2)    
         return Response('{"winner": ' + str(winner) + '}',mimetype="application/json")
     except Exception as err:

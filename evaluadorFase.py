@@ -18,7 +18,6 @@ def evaluarPreFlop(game_state):
             hand[1] = "T" + hand[1][-1]
                 
     val = calcularCartas(hand[0],hand[1])
-    print(val)
     if val >= 0.80:
         return "RAISE"
     elif val >= 0.60 and val >= percentSpent:
@@ -48,7 +47,6 @@ def evaluarFlop(game_state):
     random.shuffle(my_deck)
     my_cards = hand+community
     max_count = 20000
-    inicio = time.time()
     for opponent_hand in itertools.combinations(my_deck,2):
         oponent = list(opponent_hand)+community
         if count > max_count:
@@ -64,8 +62,7 @@ def evaluarFlop(game_state):
             
             if (evaluate_winner(best_hand_1,best_hand_2) == 1):
                    success = success + 1
-    fin = time.time()
-    print(fin-inicio)
+   
     val = success/count
     if val >= 0.80:
         if "RAISE" in actions:
@@ -98,7 +95,7 @@ def evaluarTurn(game_state):
     my_deck = [card for card in deck if not(card in hand ) and not(card in community)]
     random.shuffle(my_deck)
     my_cards = hand+community
-    inicio = time.time()
+   
     for opponent_hand in itertools.combinations(my_deck,2):
         opponent = list(opponent_hand)+community
      
@@ -113,8 +110,7 @@ def evaluarTurn(game_state):
             
             if (evaluate_winner(best_hand_1,best_hand_2) == 1):
                    success = success + 1
-    fin = time.time()
-    print(fin-inicio)
+   
     val = success/count
     if val >= 0.80:
         if "RAISE" in actions:
@@ -147,7 +143,6 @@ def evaluarRiver(game_state):
     my_deck = [card for card in deck if not(card in hand ) and not(card in community)]  
     random.shuffle(my_deck)
     my_cards = hand+community
-    inicio = time.time()
     for opponent_hand in itertools.combinations(my_deck,2):
         oponent = list(opponent_hand)+community
         count = count + 1
@@ -155,8 +150,6 @@ def evaluarRiver(game_state):
         best_hand_2 = get_best_hand(oponent)
         if (evaluate_winner(best_hand_1,best_hand_2) == 1):
             success = success + 1
-    fin = time.time()
-    print(fin-inicio)
     val = success/count
     if val >= 0.80:
         if "RAISE" in actions:
