@@ -158,6 +158,7 @@ def evaluarRiver(game_state):
     fin = time.time()
     print(fin-inicio)
     val = success/count
+    print(val)
     if val >= 0.80:
         if "RAISE" in actions:
             return "RAISE"
