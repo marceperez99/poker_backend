@@ -33,6 +33,7 @@ def evaluarPreFlop(game_state):
     else:
         return "FOLD"
 def evaluarFlop(game_state):
+    memo = {}
     actions = game_state["actions"]
     hand = game_state["player"]
     community = game_state["community"]
@@ -57,8 +58,8 @@ def evaluarFlop(game_state):
             count = count + 1
             if count > max_count:
                 break 
-            best_hand_1 = get_best_hand(my_cards+list(community_prediction))
-            best_hand_2 = get_best_hand(oponent+ list(community_prediction))
+            best_hand_1 = get_best_hand(my_cards+list(community_prediction),memo=memo)
+            best_hand_2 = get_best_hand(oponent+ list(community_prediction),memo=memo)
             
             if (evaluate_winner(best_hand_1,best_hand_2) == 1):
                    success = success + 1
@@ -95,7 +96,7 @@ def evaluarTurn(game_state):
     my_deck = [card for card in deck if not(card in hand ) and not(card in community)]
     random.shuffle(my_deck)
     my_cards = hand+community
-   
+    memo = {}
     for opponent_hand in itertools.combinations(my_deck,2):
         opponent = list(opponent_hand)+community
      
@@ -105,8 +106,8 @@ def evaluarTurn(game_state):
             count = count + 1
               
             
-            best_hand_1 = get_best_hand(my_cards + [community_prediction,])
-            best_hand_2 = get_best_hand(opponent + [community_prediction,])
+            best_hand_1 = get_best_hand(my_cards + [community_prediction,],memo=memo)
+            best_hand_2 = get_best_hand(opponent + [community_prediction,],memo=memo)
             
             if (evaluate_winner(best_hand_1,best_hand_2) == 1):
                    success = success + 1
@@ -140,14 +141,15 @@ def evaluarRiver(game_state):
     count = 0
     best_hand_1 = -1,-1
     best_hand_2 = -1,-1
+    memo = {}
     my_deck = [card for card in deck if not(card in hand ) and not(card in community)]  
     random.shuffle(my_deck)
     my_cards = hand+community
     for opponent_hand in itertools.combinations(my_deck,2):
         oponent = list(opponent_hand)+community
         count = count + 1
-        best_hand_1 = get_best_hand(my_cards)
-        best_hand_2 = get_best_hand(oponent)
+        best_hand_1 = get_best_hand(my_cards,memo=memo)
+        best_hand_2 = get_best_hand(oponent,memo=memo)
         if (evaluate_winner(best_hand_1,best_hand_2) == 1):
             success = success + 1
     val = success/count
