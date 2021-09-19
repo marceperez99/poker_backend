@@ -149,7 +149,7 @@ def getEvaluation(hand):
     #Este codigo nunca se ejecuta hehe
     return -1,-1
 
-def get_best_hand(cards):
+def get_best_hand(cards,memo={}):
     best_hand = -1,-1
     for possible_hand in itertools.combinations(cards, 5):
         if possible_hand in memo:
