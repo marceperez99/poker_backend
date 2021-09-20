@@ -51,7 +51,7 @@ def get_move():
                 action = evaluarRiver(game_state)
         return jsonify(action=action)
     except Exception as err:
-        print(err)
+        print(err)      
         raise err
         return Response("",status=500, mimetype="application/json")
 

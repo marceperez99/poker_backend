@@ -146,7 +146,7 @@ def getEvaluation(hand):
         #La mano coincide con el evaluador
         if result >= 0:
             return result,kicker
-    #Este codigo nunca se ejecuta hehe
+    #Este codigo nunca se ejecuta
     return -1,-1
 
 def get_best_hand(cards,memo={}):

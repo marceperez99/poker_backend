@@ -94,7 +94,6 @@ def evaluarTurn(game_state):
     best_hand_1 = -1,-1
     best_hand_2 = -1,-1
     my_deck = [card for card in deck if not(card in hand ) and not(card in community)]
-    random.shuffle(my_deck)
     my_cards = hand+community
     memo = {}
     for opponent_hand in itertools.combinations(my_deck,2):
@@ -143,7 +142,6 @@ def evaluarRiver(game_state):
     best_hand_2 = -1,-1
     memo = {}
     my_deck = [card for card in deck if not(card in hand ) and not(card in community)]  
-    random.shuffle(my_deck)
     my_cards = hand+community
     for opponent_hand in itertools.combinations(my_deck,2):
         oponent = list(opponent_hand)+community
