@@ -1,3 +1,6 @@
+import itertools
+import sqlite3
+memo = {}
 def get_suit(card):
     return card[-1]
 def get_numerical_value(card):
@@ -21,70 +24,94 @@ def is_highcard(hand):
     #2 to 14
     return get_numerical_value(hand[-1]),-1
 def is_pair(hand):
-    #45 to 57
+    #43 to 55
     if get_numerical_value(hand[0]) == get_numerical_value(hand[1]):
-        return 57 - (14-get_numerical_value(hand[1])),max(get_numerical_value(hand[2]),get_numerical_value(hand[3]),get_numerical_value(hand[4]))
+        return 55 - (14-get_numerical_value(hand[1])),max(get_numerical_value(hand[2]),get_numerical_value(hand[3]),get_numerical_value(hand[4]))
     if get_numerical_value(hand[1]) == get_numerical_value(hand[2]):
-        return 57 - (14-get_numerical_value(hand[2])),max(get_numerical_value(hand[0]),get_numerical_value(hand[3]),get_numerical_value(hand[4]))
+        return 55 - (14-get_numerical_value(hand[2])),max(get_numerical_value(hand[0]),get_numerical_value(hand[3]),get_numerical_value(hand[4]))
     if get_numerical_value(hand[2]) == get_numerical_value(hand[3]):
-        return 57 - (14-get_numerical_value(hand[3])),max(get_numerical_value(hand[0]),get_numerical_value(hand[1]),get_numerical_value(hand[4]))
+        return 55 - (14-get_numerical_value(hand[3])),max(get_numerical_value(hand[0]),get_numerical_value(hand[1]),get_numerical_value(hand[4]))
     if get_numerical_value(hand[3]) == get_numerical_value(hand[4]):
-        return 57 - (14-get_numerical_value(hand[4])),max(get_numerical_value(hand[0]),get_numerical_value(hand[1]),get_numerical_value(hand[2]))
+        return 55 - (14-get_numerical_value(hand[4])),max(get_numerical_value(hand[0]),get_numerical_value(hand[1]),get_numerical_value(hand[2]))
     return -1,-1
 
 def is_two_pair(hand): 
-    #58 to 69
+    #56 to 67
     if get_numerical_value(hand[0]) == get_numerical_value(hand[1]) and  get_numerical_value(hand[2]) == get_numerical_value(hand[3]):
-        return 69 - (14-get_numerical_value(hand[3])),-1
+        return 67 - (14-get_numerical_value(hand[3])),get_numerical_value(hand[1])
     if get_numerical_value(hand[0]) == get_numerical_value(hand[1]) and  get_numerical_value(hand[3]) == get_numerical_value(hand[4]):
-        return 69 - (14-get_numerical_value(hand[3])),-1
+        return 67 - (14-get_numerical_value(hand[3])),get_numerical_value(hand[1])
     if get_numerical_value(hand[1]) == get_numerical_value(hand[2]) and  get_numerical_value(hand[3]) == get_numerical_value(hand[4]):
-        return 69 - (14-get_numerical_value(hand[4])),-1
+        return 67 - (14-get_numerical_value(hand[4])),get_numerical_value(hand[2])
     return -1,-1
 def is_three_of_a_kind(hand):
-    #70 to 82
+    #68 to 80
     if get_numerical_value(hand[0]) == get_numerical_value(hand[2]):
-        return 82 - (14-get_numerical_value(hand[0])),max(get_numerical_value(hand[3]),get_numerical_value(hand[4]))
+        return 80 - (14-get_numerical_value(hand[0])),max(get_numerical_value(hand[3]),get_numerical_value(hand[4]))
     if get_numerical_value(hand[1]) == get_numerical_value(hand[3]):
-        return 82 - (14-get_numerical_value(hand[1])),max(get_numerical_value(hand[0]),get_numerical_value(hand[4]))
+        return 80 - (14-get_numerical_value(hand[1])),max(get_numerical_value(hand[0]),get_numerical_value(hand[4]))
     if get_numerical_value(hand[2]) == get_numerical_value(hand[4]):
-        return 82 - (14-get_numerical_value(hand[4])),max(get_numerical_value(hand[0]),get_numerical_value(hand[1]))
+        return 80 - (14-get_numerical_value(hand[4])),max(get_numerical_value(hand[0]),get_numerical_value(hand[1]))
     return -1,-1
 def is_straight(hand):
-    #83 to 91
+    #81 to 90
+   
+    if get_numerical_value(hand[-1]) == 14:
+        #special case "A"
+        value = 2
+        low = True
+        for card in hand[:-1]:
+            if get_numerical_value(card) != value:
+                low = False
+            value = value + 1           
+        if low:     
+            return 90 - (14 - 5),-1
     value = get_numerical_value(hand[0])
     for card in hand:
         if get_numerical_value(card) != value:
             return -1,-1  
         value = value + 1
-    return 91 - (14-get_numerical_value(hand[-1])),-1
+    return 90 - (14-get_numerical_value(hand[-1])),-1
 def is_flush(hand):
-    #92 to 99
+    #91 to 98
     suit = get_suit(hand[0])
     for card in hand:
         if get_suit(card) != suit:
             return -1,-1
-    return 99 - (14 - get_numerical_value(hand[-1])),-1 
+    return 98 - (14 - get_numerical_value(hand[-1])),-1 
 def is_full_house(hand):
-    #100 to 112
+    #99 to 111
     if get_numerical_value(hand[0]) == get_numerical_value(hand[2]) and get_numerical_value(hand[3]) == get_numerical_value(hand[4]):
-        return 112 - (14 - get_numerical_value(hand[0])),get_numerical_value(hand[3])
+        return 111 - (14 - get_numerical_value(hand[0])),get_numerical_value(hand[3])
     if get_numerical_value(hand[2]) == get_numerical_value(hand[4]) and get_numerical_value(hand[0]) == get_numerical_value(hand[1]):
-        return 112 - (14 - get_numerical_value(hand[2])),get_numerical_value(hand[0])
+        return 111 - (14 - get_numerical_value(hand[2])),get_numerical_value(hand[0])
     return -1,-1
 
 def is_four_of_a_kind(hand):
-    #113 to 125     
+    #112 to 124     
     if get_numerical_value(hand[0]) == get_numerical_value(hand[3]):
-        return 125 - (14 - get_numerical_value[1]),get_numerical_value(hand[4])
+        return 124 - (14 - get_numerical_value(hand[1])),get_numerical_value(hand[4])
     if get_numerical_value(hand[1]) == get_numerical_value(hand[4]):
-        return 125 - (14 - get_numerical_value[1]),get_numerical_value(hand[0]) 
+        return 124 - (14 - get_numerical_value(hand[1])),get_numerical_value(hand[0]) 
     return -1,-1
 
 def is_straight_flush(hand):
-    #126 to 134
+    #125 to 134
+    suit = get_suit(hand[0])
+    if get_numerical_value(hand[-1]) == 14:
+        #special case "A"
+        value = 2
+        low = True
+        for card in hand[:-1]:
+            if get_numerical_value(card) != value or suit != get_suit(card):
+                low = False
+            value = value + 1           
+        if low:     
+            return 134 - (14 - 5),-1
+    
     value = get_numerical_value(hand[0])
     suit = get_suit(hand[0])
+    
     for card in hand:
         if value != get_numerical_value(card) or get_suit(card) != suit:
             return -1,-1
@@ -112,12 +139,48 @@ def getEvaluation(hand):
         is_pair,
         is_highcard
     ]
+    hand.sort(key=get_numerical_value)
 
     for evaluator in evaluators:
-        hand.sort(key=get_numerical_value)
         result,kicker = evaluator(hand)
         #La mano coincide con el evaluador
         if result >= 0:
             return result,kicker
-    #Este codigo nunca se ejecuta hehe
+    #Este codigo nunca se ejecuta
     return -1,-1
+
+def get_best_hand(cards,memo={}):
+    best_hand = -1,-1
+    for possible_hand in itertools.combinations(cards, 5):
+        if possible_hand in memo:
+            val,kicker = memo[possible_hand]
+        else:
+            val,kicker = getEvaluation(list(possible_hand))
+            memo[possible_hand] = (val,kicker)
+        if val > best_hand[0]:
+            best_hand = val,kicker
+        elif val == best_hand[0]:
+            if kicker > best_hand[1]:
+                best_hand = val,kicker
+    return best_hand
+def evaluate_winner(player_1,player_2):
+    winner = 0
+    if(player_1[0]>player_2[0]):
+        winner = 1
+    elif(player_1[0] == player_2[0]):
+        if(player_1[1] > player_2[1]):
+            winner = 1
+        elif(player_1[1] < player_2[1]):
+            winner = 2
+    else:
+        winner = 2
+    return winner
+def get_sql_evaluation(hand):
+    hand.sort()
+    hand =  "".join(hand)
+    db = sqlite3.connect('hands.db')
+    cursor = db.cursor()
+    cursor.execute(f"SELECT evaluation,kicker from hands where id='{hand}'")
+    row = cursor.fetchall()
+    return row[0]
+
